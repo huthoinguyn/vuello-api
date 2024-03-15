@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -43,6 +45,66 @@ class User extends Authenticatable implements JWTSubject{
         'email_verified_at' => 'datetime',
         'password'          => 'hashed',
     ];
+
+    /**
+     * Get all of the boards for the User
+     *
+     * @return HasMany
+     */
+    public function boards()
+    : HasMany{
+        return $this->hasMany(Board::class);
+    }
+
+    /**
+     * Get all of the cards for the User
+     *
+     * @return HasMany
+     */
+    public function cards()
+    : HasMany{
+        return $this->hasMany(Card::class);
+    }
+
+    /**
+     * Get all of the card assigned to the User
+     *
+     * @return HasMany
+     */
+    public function assignedCards()
+    : HasMany{
+        return $this->hasMany(Card::class, 'assigned_to');
+    }
+
+    /**
+     * Get all of the card created by the User
+     *
+     * @return HasMany
+     */
+    public function createdCards()
+    : HasMany{
+        return $this->hasMany(Card::class, 'created_by');
+    }
+
+    /**
+     * Get all of the columns created by the User
+     *
+     * @return HasMany
+     */
+    public function createdColumns()
+    : HasMany{
+        return $this->hasMany(Column::class, 'created_by');
+    }
+
+    /**
+     * Get all of the card followed by the User
+     *
+     * @return BelongsToMany
+     */
+    public function followingCards()
+    : BelongsToMany{
+        return $this->belongsToMany(Card::class, 'card_followers', 'user_id', 'card_id');
+    }
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
